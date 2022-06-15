@@ -52,7 +52,7 @@ class Facenet(object):
 
         print('=> Start loading the ({}) model...'.format(self.model_path))
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.net = facenet(backbone=self.backbone, mode="predict").eval()
+        self.net = facenet(backbone=self.backbone, mode="predict",pretrained=False).eval()
         self.net.load_state_dict(torch.load(self.model_path, map_location=device), strict=False)
         print('=> model {} has been loaded.'.format(self.model_path))
 

@@ -1,7 +1,7 @@
+import os
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 from torch.nn import functional as F
-
 from models.inception_resnetv1 import InceptionResnetV1
 from models.mobilenet import MobileNetV1
 
@@ -10,9 +10,10 @@ class mobilenet(nn.Module):
     def __init__(self, pretrained):
         super(mobilenet, self).__init__()
         self.model = MobileNetV1()
+        ckpt_path="ckpt/facenet_mobilenet.pth"
         if pretrained:
             state_dict = load_state_dict_from_url(
-                "https://github.com/bubbliiiing/facenet-pytorch/releases/download/v1.0/backbone_weights_of_mobilenetv1.pth",
+                "https://github.com/axjing/GenFaceID/releases/download/v0.001/facenet_mobilenet.pth",
                 model_dir="ckpt",
                 progress=True)
             self.model.load_state_dict(state_dict)
@@ -32,8 +33,10 @@ class inception_resnet(nn.Module):
         super(inception_resnet, self).__init__()
         self.model = InceptionResnetV1()
         if pretrained:
+            ckpt_path="../ckpt/facenet_inception_resnetv1.pth"
+            print("-------------:",os.path.isfile(ckpt_path))
             state_dict = load_state_dict_from_url(
-                "https://github.com/bubbliiiing/facenet-pytorch/releases/download/v1.0/backbone_weights_of_inception_resnetv1.pth",
+                "https://github.com/axjing/GenFaceID/releases/download/v0.001/facenet_inception_resnetv1.pth",
                 model_dir="ckpt",
                 progress=True)
             self.model.load_state_dict(state_dict)
