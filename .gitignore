@@ -155,7 +155,7 @@ coverage.xml
 cover/
 
 *.ckpt
-*.pth
+#*.pth
 # Translations
 *.mo
 *.pot
