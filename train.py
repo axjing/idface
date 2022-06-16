@@ -154,9 +154,8 @@ if __name__ == "__main__":
     lfw_dir_path = "lfw"
     lfw_pairs_path = "ckpt/lfw_pair.txt"
 
-    # ------------------------------------------------------#
+
     #   设置用到的显卡
-    # ------------------------------------------------------#
     ngpus_per_node = torch.cuda.device_count()
     if distributed:
         dist.init_process_group(backend="nccl")
@@ -172,21 +171,16 @@ if __name__ == "__main__":
         rank = 0
 
     num_classes = get_num_classes(annotation_path)
-    # ---------------------------------#
+
     #   载入模型并加载预训练权重
-    # ---------------------------------#
     model = Facenet(backbone=backbone, num_classes=num_classes, pretrained=pretrained)
 
     if model_path != '':
-        # ------------------------------------------------------#
-        #   权值文件请看README，百度网盘下载
-        # ------------------------------------------------------#
         if local_rank == 0:
             print('Load weights {}.'.format(model_path))
 
-        # ------------------------------------------------------#
+
         #   根据预训练权重的Key和模型的Key进行加载
-        # ------------------------------------------------------#
         model_dict = model.state_dict()
         pretrained_dict = torch.load(model_path, map_location=device)
         load_key, no_load_key, temp_dict = [], [], {}
@@ -198,27 +192,23 @@ if __name__ == "__main__":
                 no_load_key.append(k)
         model_dict.update(temp_dict)
         model.load_state_dict(model_dict)
-        # ------------------------------------------------------#
+
         #   显示没有匹配上的Key
-        # ------------------------------------------------------#
         if local_rank == 0:
             print("\nSuccessful Load Key:", str(load_key)[:500], "……\nSuccessful Load Key Num:", len(load_key))
             print("\nFail To Load Key:", str(no_load_key)[:500], "……\nFail To Load Key num:", len(no_load_key))
             print("\n\033[1;33;44m温馨提示，head部分没有载入是正常现象，Backbone部分没有载入是错误的。\033[0m")
 
     loss = triplet_loss()
-    # ----------------------#
+
     #   记录Loss
-    # ----------------------#
     if local_rank == 0:
         loss_history = LossHistory(save_dir, model, input_shape=input_shape)
     else:
         loss_history = None
 
-    # ------------------------------------------------------------------#
-    #   torch 1.2不支持amp，建议使用torch 1.7.1及以上正确使用fp16
-    #   因此torch1.2这里显示"could not be resolve"
-    # ------------------------------------------------------------------#
+
+    #   torch 1.2不支持amp，保证 torch> 1.7.1
     if fp16:
         from torch.cuda.amp import GradScaler as GradScaler
 
@@ -227,9 +217,8 @@ if __name__ == "__main__":
         scaler = None
 
     model_train = model.train()
-    # ----------------------------#
+
     #   多卡同步Bn
-    # ----------------------------#
     if sync_bn and ngpus_per_node > 1 and distributed:
         model_train = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model_train)
     elif sync_bn:
@@ -237,9 +226,8 @@ if __name__ == "__main__":
 
     if Cuda:
         if distributed:
-            # ----------------------------#
+
             #   多卡平行运行
-            # ----------------------------#
             model_train = model_train.cuda(local_rank)
             model_train = torch.nn.parallel.DistributedDataParallel(model_train, device_ids=[local_rank],
                                                                     find_unused_parameters=True)

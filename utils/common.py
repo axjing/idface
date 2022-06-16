@@ -64,12 +64,15 @@ def print_config(**kwargs):
         print('|%25s | %40s|' % (str(key), str(value)))
     print('-' * 70)
 
-def get_file_path(dir,suffix=".jpg"):
+def get_file_path(dir,suffix="jpg"):
 
     path_list=[]
     for f in os.listdir(dir):
-        if f.split(".")==suffix:
+        if f.split(".")[-1]==suffix:
             path_list.append(os.path.join(dir,f))
 
     return path_list
+
+def get_filename_in_path(file_path:str):
+    return os.path.split(file_path)[-1].split(".")
 

@@ -1,4 +1,5 @@
 import os
+import torch
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 from torch.nn import functional as F
@@ -10,12 +11,16 @@ class mobilenet(nn.Module):
     def __init__(self, pretrained):
         super(mobilenet, self).__init__()
         self.model = MobileNetV1()
-        ckpt_path="ckpt/facenet_mobilenet.pth"
+        ckpt_path = "ckpt/mobilenetv1.pth"
         if pretrained:
-            state_dict = load_state_dict_from_url(
-                "https://github.com/axjing/GenFaceID/releases/download/v0.001/facenet_mobilenet.pth",
-                model_dir="ckpt",
-                progress=True)
+            if os.path.isfile(ckpt_path):
+                state_dict = torch.load(ckpt_path)
+            else:
+                state_dict = load_state_dict_from_url(
+                    "https://github.com/axjing/GenFaceID/releases/download/v0.001/mobilenetv1.pth",
+                    model_dir="ckpt",
+                    progress=True)
+
             self.model.load_state_dict(state_dict)
 
         del self.model.fc
@@ -33,12 +38,14 @@ class inception_resnet(nn.Module):
         super(inception_resnet, self).__init__()
         self.model = InceptionResnetV1()
         if pretrained:
-            ckpt_path="../ckpt/facenet_inception_resnetv1.pth"
-            print("-------------:",os.path.isfile(ckpt_path))
-            state_dict = load_state_dict_from_url(
-                "https://github.com/axjing/GenFaceID/releases/download/v0.001/facenet_inception_resnetv1.pth",
-                model_dir="ckpt",
-                progress=True)
+            ckpt_path = "ckpt/inception_resnetv1.pth"
+            if os.path.isfile(ckpt_path):
+                state_dict = torch.load(ckpt_path)
+            else:
+                state_dict = load_state_dict_from_url(
+                    "https://github.com/axjing/GenFaceID/releases/download/v0.001/inception_resnetv1.pth",
+                    model_dir="ckpt",
+                    progress=True)
             self.model.load_state_dict(state_dict)
 
     def forward(self, x):
