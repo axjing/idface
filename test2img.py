@@ -21,22 +21,23 @@ def inference_facedb(input_im, face_dir):
     :param face_dir:人脸数据库文件夹
     :return:
     """
+
     model = Facenet()
     paths = get_file_path(face_dir, suffix="jpg")
-    people_id = ["", 1000000]
+    people_id = ["", float("inf")]
     for i in range(len(paths)):
         face_file_i = paths[i]
         image_1 = Image.open(input_im)
         image_2 = Image.open(face_file_i)
         similarity = model.detect_image(image_1, image_2)
         db_name = g_nm(face_file_i)[0]
-        print("The distance from {} to {} is {} ".format(g_nm(input_im)[0], db_name, similarity))
-        if similarity < people_id[-1]:
+        print("{}\t---->\t{} | Distance: {} ".format(g_nm(input_im)[0], db_name, similarity))
+        if similarity[0] < people_id[-1]:
             people_id[0] = db_name
-            people_id[-1] = similarity
+            people_id[-1] = similarity[0]
 
     print("="*50)
-    print("Identity:{},Distance:{}".format(people_id[0],people_id[-1]))
+    print("\tIdentity:{} | Distance:{:.4f}".format(people_id[0],people_id[-1]))
     print("="*50)
 
     return people_id

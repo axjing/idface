@@ -89,7 +89,7 @@ class Facenet(object):
             output2 = self.net(photo_2).cpu().numpy()
 
             #   计算二者之间的距离
-            l1 = np.linalg.norm(output1 - output2, axis=1)  # 验证集损失较低不代表准确度较高，仅代表该权值在验证集上泛化性能较好。
+            l1 = np.linalg.norm(output1 - output2, axis=1)
         plt.figure()
 
         plt.subplot(1, 2, 1)

@@ -16,10 +16,10 @@ from utils.common import get_num_classes, print_config
 from utils.utils_fit import fit_one_epoch
 
 if __name__ == "__main__":
-    
+
     #   是否使用Cuda
     #   没有GPU可以设置成False
-    
+
     Cuda = True
     # ---------------------------------------------------------------------#
     #   distributed     用于指定是否使用单机多卡分布式运行
@@ -106,15 +106,10 @@ if __name__ == "__main__":
     Init_Epoch = 0
     Epoch = 100
 
-    # ------------------------------------------------------------------#
+
     #   其它训练参数：学习率、优化器、学习率下降有关
-    # ------------------------------------------------------------------#
-    # ------------------------------------------------------------------#
-    #   Init_lr         模型的最大学习率
-    #   Min_lr          模型的最小学习率，默认为最大学习率的0.01
-    # ------------------------------------------------------------------#
-    Init_lr = 1e-3
-    Min_lr = Init_lr * 0.01
+    Init_lr = 1e-3#   Init_lr         模型的最大学习率
+    Min_lr = Init_lr * 0.01#   Min_lr          模型的最小学习率，默认为最大学习率的0.01
     # ------------------------------------------------------------------#
     #   optimizer_type  使用到的优化器种类，可选的有adam、sgd
     #                   当使用Adam优化器时建议设置  Init_lr=1e-3
@@ -126,34 +121,26 @@ if __name__ == "__main__":
     optimizer_type = "adam"
     momentum = 0.9
     weight_decay = 0
-    # ------------------------------------------------------------------#
-    #   lr_decay_type   使用到的学习率下降方式，可选的有step、cos
-    # ------------------------------------------------------------------#
-    lr_decay_type = "cos"
-    # ------------------------------------------------------------------#
-    #   save_period     多少个epoch保存一次权值，默认每个世代都保存
-    # ------------------------------------------------------------------#
-    save_period = 1
-    # ------------------------------------------------------------------#
-    #   save_dir        权值与日志文件保存的文件夹
-    # ------------------------------------------------------------------#
-    save_dir = 'logs'
+
+    lr_decay_type = "cos"  # lr_decay_type   使用到的学习率下降方式，可选的有step or cos
+
+    save_period = 1  # save_period     多少个epoch保存一次权值，默认每个世代都保存
+
+    save_dir = 'logs'  # 日志文件保存的文件夹
+    ckpt_dir="ckpt" # 训练权重保存文件夹
     # ------------------------------------------------------------------#
     #   用于设置是否使用多线程读取数据
     #   开启后会加快数据读取速度，但是会占用更多内存
     #   内存较小的电脑可以设置为2或者0  
     # ------------------------------------------------------------------#
     num_workers = 4
-    # ------------------------------------------------------------------#
+
     #   是否开启LFW评估
-    # ------------------------------------------------------------------#
     lfw_eval_flag = True
-    # ------------------------------------------------------------------#
+
     #   LFW评估数据集的文件路径和对应的txt文件
-    # ------------------------------------------------------------------#
     lfw_dir_path = "lfw"
     lfw_pairs_path = "ckpt/lfw_pair.txt"
-
 
     #   设置用到的显卡
     ngpus_per_node = torch.cuda.device_count()
@@ -178,7 +165,6 @@ if __name__ == "__main__":
     if model_path != '':
         if local_rank == 0:
             print('Load weights {}.'.format(model_path))
-
 
         #   根据预训练权重的Key和模型的Key进行加载
         model_dict = model.state_dict()
@@ -206,7 +192,6 @@ if __name__ == "__main__":
         loss_history = LossHistory(save_dir, model, input_shape=input_shape)
     else:
         loss_history = None
-
 
     #   torch 1.2不支持amp，保证 torch> 1.7.1
     if fp16:
@@ -265,18 +250,16 @@ if __name__ == "__main__":
     if True:
         if batch_size % 3 != 0:
             raise ValueError("Batch_size must be the multiple of 3.")
-        # -------------------------------------------------------------------#
+
         #   判断当前batch_size，自适应调整学习率
-        # -------------------------------------------------------------------#
         nbs = 64
         lr_limit_max = 1e-3 if optimizer_type == 'adam' else 1e-1
         lr_limit_min = 3e-4 if optimizer_type == 'adam' else 5e-4
         Init_lr_fit = min(max(batch_size / nbs * Init_lr, lr_limit_min), lr_limit_max)
         Min_lr_fit = min(max(batch_size / nbs * Min_lr, lr_limit_min * 1e-2), lr_limit_max * 1e-2)
 
-        # ---------------------------------------#
+
         #   根据optimizer_type选择优化器
-        # ---------------------------------------#
         optimizer = {
             'adam': optim.Adam(model.parameters(), Init_lr_fit, betas=(momentum, 0.999), weight_decay=weight_decay),
             'sgd': optim.SGD(model.parameters(), Init_lr_fit, momentum=momentum, nesterov=True,
@@ -297,9 +280,7 @@ if __name__ == "__main__":
         if epoch_step == 0 or epoch_step_val == 0:
             raise ValueError("数据集过小，无法继续进行训练，请扩充数据集。")
 
-        # ---------------------------------------#
-        #   构建数据集加载器。
-        # ---------------------------------------#
+        #   构建数据集加载器
         train_dataset = FacenetDataset(input_shape, lines[:num_train], num_classes, random=True)
         val_dataset = FacenetDataset(input_shape, lines[num_train:], num_classes, random=False)
 
@@ -328,7 +309,7 @@ if __name__ == "__main__":
 
             fit_one_epoch(model_train, model, loss_history, loss, optimizer, epoch, epoch_step, epoch_step_val, gen,
                           gen_val, Epoch, Cuda, LFW_loader, batch_size // 3, lfw_eval_flag, fp16, scaler, save_period,
-                          save_dir, local_rank)
+                          ckpt_dir, local_rank)
 
         if local_rank == 0:
             loss_history.writer.close()

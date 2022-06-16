@@ -152,10 +152,11 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+datasets/CASIA-WebFace
 cover/
 
 *.ckpt
-#*.pth
+*.pth
 # Translations
 *.mo
 *.pot
