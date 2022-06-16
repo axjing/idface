@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
@@ -33,7 +34,8 @@ class Facenet(object):
 
         self.generate()
 
-        print_config(**self._defaults)
+        # print_config(**self._defaults)
+        print("Activate The Face Recognition Algorithm...")
 
     def generate(self):
         """
@@ -90,16 +92,5 @@ class Facenet(object):
 
             #   计算二者之间的距离
             l1 = np.linalg.norm(output1 - output2, axis=1)
-        plt.figure()
 
-        plt.subplot(1, 2, 1)
-        plt.title("Input Image")
-        plt.imshow(np.array(input_im))
-
-        plt.subplot(1, 2, 2)
-        plt.title("Database Image")
-        plt.imshow(np.array(compared_im))
-
-        plt.text(-20, -20, 'Distance:{:.3f}'.format(l1[0]), ha='center', va='bottom', fontsize=14, color="r")
-        plt.show()
-        return l1
+        return l1,input_im,compared_im

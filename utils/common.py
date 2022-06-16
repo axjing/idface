@@ -1,8 +1,27 @@
 import os
-
+import time
 import numpy as np
 import torch
 from PIL import Image
+import matplotlib.pyplot as plt
+
+def show_two_image(input_im,compared_im,ins=None,wait=0):
+    fig=plt.figure(figsize=(9,6))
+    plt.ion()    # 打开交互模式
+    plt.subplot(1, 2, 1)
+    plt.title("Input Image")
+    plt.imshow(np.array(input_im))
+    plt.subplot(1, 2, 2)
+    plt.title("FaceDB Image")
+    plt.imshow(np.array(compared_im))
+    plt.text(-20, -20, 'Distance:{:.3f}'.format(ins), ha='center', va='bottom', fontsize=14, color="r")
+    fig.show()
+    # # 显示前关掉交互模式
+    plt.ioff()
+    plt.pause(wait)                     # 显示秒数
+    plt.clf()
+    plt.close(fig)
+    return fig
 
 #---------------------------------------------------------#
 #   将图像转换成RGB图像，防止灰度图在预测时报错。
