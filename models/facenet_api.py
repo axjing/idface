@@ -35,7 +35,7 @@ class Facenet(object):
         self.generate()
 
         # print_config(**self._defaults)
-        print("Activate The Face Recognition Algorithm...")
+        print("\nActivate The Face Recognition Algorithm...")
 
     def generate(self):
         """

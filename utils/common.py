@@ -18,7 +18,7 @@ def show_two_image(input_im,compared_im,ins=None,wait=0):
     fig.show()
     # # 显示前关掉交互模式
     plt.ioff()
-    plt.pause(wait)                     # 显示秒数
+    # plt.pause(wait)                     # 显示秒数
     plt.clf()
     plt.close(fig)
     return fig

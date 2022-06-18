@@ -23,7 +23,8 @@ def inference_facedb(input_im, face_dir):
     :param face_dir:人脸数据库文件夹
     :return:
     """
-    WAIT=0.5
+    image_1 = Image.open(input_im)
+    WAIT=0
     start_i=time.time()
     model = Facenet()
     paths = get_file_path(face_dir, suffix="jpg")
@@ -31,19 +32,15 @@ def inference_facedb(input_im, face_dir):
     print_time=0
     for i in tqdm(range(len(paths)), desc='Processing'):
         face_file_i = paths[i]
-        image_1 = Image.open(input_im)
         image_2 = Image.open(face_file_i)
         similarity,inp_im,com_im = model.detect_image(image_1, image_2)
-        # start_=time.time()
         show_two_image(inp_im,com_im,similarity[0],WAIT)
-        # spend_=time.time()-start_
-        # print_time+=spend_
         db_name = g_nm(face_file_i)[0]
         # print("{}\t---->\t{} | \tDistance: {} ".format(g_nm(input_im)[0], db_name, similarity))
         if similarity[0] < people_id[-1]:
             people_id[0] = db_name
             people_id[-1] = similarity[0]
-        # time.sleep(WAIT)
+
         
     spend=time.time()-start_i-len(paths)*WAIT-print_time
     print("...\n\n")
