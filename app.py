@@ -1,4 +1,3 @@
-import easyocr
 import time
 import streamlit as st
 from PIL import Image
@@ -29,10 +28,9 @@ def image_input():
     #     content_file = st.sidebar.file_uploader("Choose a Content  Image", type=["png", "jpg"])
     # else:
     #     content_file = st.sidebar.file_uploader("Choose a Content  Image", type=["png", "jpg"])
-    content_file = st.sidebar.file_uploader("Choose a Content  Image", type=["png", "jpg"])
+    content_file = st.sidebar.file_uploader("Choose a Content  Image", accept_multiple_files=False,type=["png", "jpg"])
     if content_file is not None:
         # To read file as bytes:
-        bytes_data = content_file.getvalue()
         image_1 = Image.open(content_file)
         st.markdown("## 申请进入")
         st.image(image_1)
@@ -41,11 +39,11 @@ def image_input():
         face_dir = r"../data/face_db"
         paths = get_file_path(face_dir, suffix="jpg")
         people_id = ["", float("inf"),0]
-        print_time = 0
-        # 添加占位符
-        placeholder = st.empty()
-        # 创建进度条
-        bar = st.progress(0)
+
+        # # 添加占位符
+        # placeholder = st.empty()
+        # # 创建进度条
+        # bar = st.progress(0)
         for i in range(len(paths)):
             face_file_i = paths[i]
             image_2 = Image.open(face_file_i)
@@ -58,10 +56,10 @@ def image_input():
                 people_id[1] = similarity[0]
                 people_id[2]=com_im
 
-            # 不断更新占位符的内容
-            placeholder.text(f"Processing {i + 1}")
-            # 不断更新进度条
-            bar.progress(i + 1)
+            # # 不断更新占位符的内容
+            # placeholder.text(f"Processing {i + 1}")
+            # # 不断更新进度条
+            # bar.progress(i + 1)
 
         spend = time.time() - start - len(paths) * WAIT
         st.markdown("## 识别结果")
